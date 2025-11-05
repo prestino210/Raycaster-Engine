@@ -25,7 +25,7 @@
 #define ROT_SPEED 130
 #define SPAWN_X 0
 #define SPAWN_Y 0
-#define MAP_FILE "../map.txt"
+#define MAP_FILE "../../map.txt"
 
 typedef struct {
     float rotation; 
@@ -58,6 +58,7 @@ void load_map(void) {
 
     unsigned int i = 0;
     while((nread = getline(&line, &len, file)) != -1) {
+       
         if(line[nread - 1] == '\n') nread--;
 
         if(i == 0) map_width = nread;
@@ -67,10 +68,12 @@ void load_map(void) {
         for(int j = 0; j < nread; j++) {
             row[j] = (int) line[j] - '0';
         }
-        map = realloc(map, i *  (map_width * sizeof(int)));
+        map = realloc(map, (i *  (map_width * sizeof(int))));
         map[i] = row;
+       
         i++;
     }
+
     map_height = i;
 
     free(line);
@@ -247,7 +250,6 @@ bool update(void) {
 }
 
 int main(void) {
-
     load_map();
     cols = malloc(NUM_COLS * sizeof(float));
 

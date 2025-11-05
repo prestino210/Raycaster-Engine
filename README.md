@@ -14,3 +14,5 @@ To build, you have to clone SDL's SDL2 branch into 'external' as 'SDL2'; you can
 * Uses method 'getline' (*POSIX specific!*)
 
 * You can edit *map.txt*; **1** is a wall, **0** is none for the raycaster
+
+* Keep in mind: since I didn't write a method to get the executable path, it searches for the map file in the *cwd*. You can change the macro for the path, or just run it differently to avoid a segfault.
