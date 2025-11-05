@@ -3,7 +3,6 @@
 #include <SDL2/SDL.h>
 #include <math.h>
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #define WINDOW_TITLE "Ray Caster"
 #define SCREEN_WIDTH 1600
@@ -65,8 +64,8 @@ void load_map(void) {
 
         int* row = malloc((nread) * sizeof(int));
 
-        for(int i = 0; i < nread; i++) {
-            row[i] = (int) line[i] - '0';
+        for(int j = 0; j < nread; j++) {
+            row[j] = (int) line[j] - '0';
         }
         map = realloc(map, i *  (map_width * sizeof(int)));
         map[i] = row;
@@ -282,5 +281,9 @@ int main(void) {
     SDL_DestroyRenderer(rc_renderer);
     SDL_Quit();
     free(cols);
+    for(int i = 0; i < map_height; i++) {
+        free(map[i]);
+    }
+    free(map);
     return 0;
 }
