@@ -49,8 +49,25 @@ float* cols;
 int** map = NULL;
 Camera camera;
 
+void destruct(int exit_code, char* error) {
+    if(exit_code == EXIT_FAILURE) printf("%s\n", error);
+    SDL_DestroyWindow(rc_window);
+    SDL_DestroyRenderer(rc_renderer);
+    SDL_Quit();
+    free(cols);
+    for(int i = 0; i < map_height; i++) {
+        free(map[i]);
+    }
+    free(map);
+    exit(exit_code);
+}
+
 void load_map(void) {
     FILE* file = fopen(MAP_FILE, "r");
+
+    if(file == NULL) {
+        destruct(EXIT_FAILURE, "Could not open specified file.");
+    }
 
     char* line = NULL;
     size_t len = 0;
@@ -61,20 +78,30 @@ void load_map(void) {
        
         if(line[nread - 1] == '\n') nread--;
 
-        if(i == 0) map_width = nread;
+        if(i == 0 && nread > 0) {
+            map_width = nread;
+        } else if(i == 0 && nread <= 0) {
+            destruct(EXIT_FAILURE, "Invalid map width.");
+        } else if(i != 0 && nread != map_width) {
+            destruct(EXIT_FAILURE, "Inconsistent map width.");
+        }
 
         int* row = malloc((nread) * sizeof(int));
 
         for(int j = 0; j < nread; j++) {
             row[j] = (int) line[j] - '0';
         }
-        map = realloc(map, (i *  (map_width * sizeof(int))));
+        map = realloc(map, (i+1) * (map_width * (sizeof(int))));
         map[i] = row;
        
         i++;
     }
 
-    map_height = i;
+    if(i > 0) {
+        map_height = i;
+    } else {
+        destruct(EXIT_FAILURE, "Invalid number of lines.");
+    }
 
     free(line);
     fclose(file);
@@ -232,7 +259,7 @@ void cast_rays(void) {
         if (col_height > SCREEN_HEIGHT) col_height = SCREEN_HEIGHT;
         if (col_height < 0) col_height = 0;
 
-        cols[i] = col_height;
+        cols[i] = col_height++;
     }
 }
 
@@ -278,14 +305,5 @@ int main(void) {
         double frame_time = (double) (SDL_GetPerformanceCounter() - now) / SDL_GetPerformanceFrequency() * 1000.0;
         if(frame_time < ref_delay_hz) SDL_Delay((Uint8) (ref_delay_hz - frame_time));
     }
-
-    SDL_DestroyWindow(rc_window);
-    SDL_DestroyRenderer(rc_renderer);
-    SDL_Quit();
-    free(cols);
-    for(int i = 0; i < map_height; i++) {
-        free(map[i]);
-    }
-    free(map);
-    return 0;
+    destruct(EXIT_SUCCESS, NULL);
 }
