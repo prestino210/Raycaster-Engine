@@ -108,13 +108,15 @@ void load_map(char* file_path) {
             destruct(EXIT_FAILURE, "Inconsistent map width.");
         }
 
-        int* row = malloc((nread) * sizeof(int));
-
-        for(int j = 0; j < nread; j++) {
-            row[j] = (int) line[j] - '0';
+        map = realloc(map, (i+1) * (sizeof(int*)));
+        map[i] = malloc(map_width * sizeof(int));
+        for(int j = 0; j < map_width; j++) {
+            if(line[j] == '0' || line[j] == '1') {
+                map[i][j] = (int) line[j] - '0';
+            } else {
+                destruct(EXIT_FAILURE, "Invalid map character.");
+            }   
         }
-        map = realloc(map, (i+1) * (map_width * (sizeof(int))));
-        map[i] = row;
        
         i++;
     }
